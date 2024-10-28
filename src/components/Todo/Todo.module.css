@@ -1,0 +1,25 @@
+/* .input {
+  border: 1px solid black;
+  border-radius: 6px;
+} */
+
+.input button {
+  background-color: black !important;
+  color: white;
+}
+
+.input button:active {
+  background-color: rgb(42, 42, 42) !important;
+}
+
+@media (min-width: 768px) {
+  .input {
+    width: 520px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .input {
+    width: 720px;
+  }
+}

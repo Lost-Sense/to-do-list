@@ -1,0 +1,31 @@
+@font-face {
+  font-family: 'Mulish';
+  src: url('./font/Mulish-ExtraLight.ttf');
+}
+
+:root {
+  font-family: 'Mulish';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 60px;
+  background-color: white;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    margin-top: 100px;
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    margin-top: 200px;
+  }
+}
