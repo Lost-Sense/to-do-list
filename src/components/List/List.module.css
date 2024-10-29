@@ -98,13 +98,14 @@
   transition: scale 0.3s;
   transition: background-color 0.5s;
   border: 2px solid black;
+  outline: none;
 }
 
 .button_show:active {
   scale: 97%;
 }
 
-.button_show:focus {
+.active {
   background-color: rgb(255, 255, 255);
   border: 1px solid rgb(46, 46, 46);
   color: #000000;
@@ -139,6 +140,41 @@
   gap: 0px 20px;
   white-space: normal;
   word-wrap: break-word;
+}
+
+.customCheckbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkboxInput {
+  display: none;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  position: relative;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.checkboxInput:checked + .checkbox {
+  background-color: #000000;
+  border-color: #000000;
+}
+
+.checkboxInput:checked + .checkbox::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 5px;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(90deg);
 }
 
 @media (min-width: 443px) {
