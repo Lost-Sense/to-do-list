@@ -1,10 +1,17 @@
 import { TypeList } from './List.type';
 import s from './List.module.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 export function List({ valueTask, setValueTask }: TypeList) {
   const [newTitle, setNewTitle] = useState<{ [key: string]: string }>({});
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
+  const showAllButtonRef = useRef<HTMLButtonElement>(null);
+
+  useLayoutEffect(() => {
+    if (showAllButtonRef.current) {
+      showAllButtonRef.current.focus();
+    }
+  }, []);
 
   useEffect(() => {
     const savedTasks = localStorage.getItem('tasks');
@@ -22,21 +29,10 @@ export function List({ valueTask, setValueTask }: TypeList) {
   const startEditing = (task: { id: string; title: string }) => {
     setNewTitle((prev) => ({ ...prev, [task.id]: task.title }));
     const updatedTasks = valueTask.map((t) =>
-      t.id === task.id ? { ...t, isEditing: true, completed: false } : t
+      t.id === task.id ? { ...t, isEditing: true } : t
     );
     setValueTask(updatedTasks);
     localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-  };
-
-  const saveEdit = (id: string) => {
-    const title = newTitle[id];
-    if (!title.trim()) return;
-    const updatedTasks = valueTask.map((task) =>
-      task.id === id ? { ...task, title: title, isEditing: false } : task
-    );
-    setValueTask(updatedTasks);
-    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-    setNewTitle((prev) => ({ ...prev, [id]: '' }));
   };
 
   const cancelEdit = (task: { id: string; title: string }) => {
@@ -45,6 +41,22 @@ export function List({ valueTask, setValueTask }: TypeList) {
     );
     setValueTask(updatedTasks);
     localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+  };
+
+  const saveEdit = (id: string, title: string) => {
+    const titlle = newTitle[id] || '';
+    if (!titlle.trim() || titlle === title) {
+      cancelEdit({ id, title });
+      return;
+    }
+    const updatedTasks = valueTask.map((task) =>
+      task.id === id
+        ? { ...task, title: titlle, isEditing: false, completed: false }
+        : task
+    );
+    setValueTask(updatedTasks);
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    setNewTitle((prev) => ({ ...prev, [id]: '' }));
   };
 
   const toggleTaskCompletion = (id: string) => {
@@ -74,14 +86,23 @@ export function List({ valueTask, setValueTask }: TypeList) {
   return (
     <>
       <div className={s.show_buttons}>
-        <button className={s.button_show} onClick={() => setFilter('all')}>
+        <button
+          className={`${s.button_show} ${filter === 'all' ? s.active : ''}`}
+          onClick={() => setFilter('all')}
+          ref={showAllButtonRef}
+        >
           Show All Tasks
         </button>
-        <button className={s.button_show} onClick={() => setFilter('active')}>
+        <button
+          className={`${s.button_show} ${filter === 'active' ? s.active : ''}`}
+          onClick={() => setFilter('active')}
+        >
           Show Active Tasks
         </button>
         <button
-          className={s.button_show}
+          className={`${s.button_show} ${
+            filter === 'completed' ? s.active : ''
+          }`}
           onClick={() => setFilter('completed')}
         >
           Show completed Tasks
@@ -94,12 +115,16 @@ export function List({ valueTask, setValueTask }: TypeList) {
             key={task.id}
           >
             {!task.isEditing && (
-              <input
-                name={task.id}
-                type="checkbox"
-                checked={task.completed}
-                onChange={() => toggleTaskCompletion(task.id)}
-              />
+              <label className={s.customCheckbox}>
+                <input
+                  className={s.checkboxInput}
+                  name={task.id}
+                  type="checkbox"
+                  checked={task.completed}
+                  onChange={() => toggleTaskCompletion(task.id)}
+                />
+                <span className={s.checkbox}></span>
+              </label>
             )}
             {task.isEditing ? (
               <div className={s.editing}>
@@ -114,7 +139,7 @@ export function List({ valueTask, setValueTask }: TypeList) {
                 <div className={s.group_buttons}>
                   <button
                     className={s.button_save}
-                    onClick={() => saveEdit(task.id)}
+                    onClick={() => saveEdit(task.id, task.title)}
                   >
                     SAVE
                   </button>
